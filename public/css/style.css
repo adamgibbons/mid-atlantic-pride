@@ -16,8 +16,9 @@ h1 {
 
 h2 {
   font-family: 'Shadows Into Light Two', cursive;
-  font-size:33px;
+  font-size:38px;
   font-style:oblique;
+  font-weight:100;
 }
 
 .logos-wrapper {
@@ -31,3 +32,11 @@ h2 {
   padding:0;
   margin-right:70px;
 }
+
+
+.tweet article {
+  font-family:sans-serif;
+  margin:15px 0;
+  text-align:left;
+}
+
