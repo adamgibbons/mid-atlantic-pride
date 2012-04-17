@@ -31,13 +31,16 @@ twit.immortalStream 'statuses/filter', {"track": track.join(",")}, (stream) ->
         console.log tweet.message
 
 http = require('http')
-static = require('node-static')
-file = new static.Server('../public')
+io = require('socket.io')
+nodeStatic = require('node-static')
+file = new nodeStatic.Server('./public')
 
 server = http.createServer (request, response) ->
   request.addListener 'end', () ->
-    file.serve(request, response)
+    file.serve request, response, (e, err) ->
+      if (e && (e.status == 404))
+        console.log 'file not found'
 
-
+io.listen(server)
 server.listen 8080, () ->
-  console.log '% listening at %s', server.name, server.url
+  console.log '% listening at %', server.name, server.url
