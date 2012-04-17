@@ -1,3 +1,28 @@
+nodeStatic = require('node-static')
+file = new nodeStatic.Server('./public')
+
+handler = (request, response) ->
+  console.log 'request came in'
+  request.addListener 'end', () ->
+    file.serve request, response, (e, err) ->
+      console.log 'server static'
+      if (e && (e.status == 404))
+        console.log 'file not found'
+
+app = require('http').createServer(handler)
+io = require('socket.io').listen(app)
+
+io.sockets.on 'connection', (socket) ->
+  Tweet.find().limit(10).asc('created_at').run (err,docs) ->
+    if err
+      console.log err
+    else
+      for tweet in docs
+        socket.emit 'tweet', {message: tweet.message, username: tweet.username}
+
+app.listen 8080, () ->
+  console.log '%s listening at %s', app.host, app.port
+
 mongoose = require 'mongoose'
 twitter = require './immortal-ntwitter.js'
 
@@ -31,28 +56,5 @@ twit.immortalStream 'statuses/filter', {"track": track.join(",")}, (stream) ->
         console.log err
       else
         console.log tweet.message
+        io.sockets.emit('tweet', {message: tweet.message, username: tweet.username})
 
-nodeStatic = require('node-static')
-file = new nodeStatic.Server('./public')
-
-handler = (request, response) ->
-  console.log 'request came in'
-  request.addListener 'end', () ->
-    file.serve request, response, (e, err) ->
-      console.log 'server static'
-      if (e && (e.status == 404))
-        console.log 'file not found'
-
-app = require('http').createServer(handler)
-io = require('socket.io').listen(app)
-
-io.sockets.on 'connection', (socket) ->
-  Tweet.find().limit(10).asc('created_at').run (err,docs) ->
-    if err
-      console.log err
-    else
-      for tweet in docs
-        socket.emit 'tweet', {message: tweet.message, username: tweet.username}
-
-app.listen 8080, () ->
-  console.log '%s listening at %s', app.host, app.port
