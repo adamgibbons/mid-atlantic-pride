@@ -1,4 +1,3 @@
-io = require('socket.io').listen(8080)
 mongoose = require 'mongoose'
 twitter = require './immortal-ntwitter.js'
 
@@ -31,5 +30,14 @@ twit.immortalStream 'statuses/filter', {"track": track.join(",")}, (stream) ->
       else
         console.log tweet.message
 
-io.sockets.on 'connections', (socket) ->
-  socket.emit('news', { hello: 'world' })
+http = require('http')
+static = require('node-static')
+file = new static.Server('../public')
+
+server = http.createServer (request, response) ->
+  request.addListener 'end', () ->
+    file.serve(request, response)
+
+
+server.listen 8080, () ->
+  console.log '% listening at %s', server.name, server.url
