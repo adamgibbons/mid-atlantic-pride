@@ -14,6 +14,7 @@ mongodb = mongoose.connect('mongodb://moveline:moveline@ds031857.mongolab.com:31
 TweetSchema = new mongoose.Schema({
   message: String
   username: String
+  created_at: Date
 })
 
 Tweet = mongoose.model('Tweets', TweetSchema)
@@ -24,23 +25,34 @@ twit.immortalStream 'statuses/filter', {"track": track.join(",")}, (stream) ->
     tweet = new Tweet()
     tweet.message = data.text
     tweet.username = data.user.name
+    tweet.created_at = data.created_at
     tweet.save (err) ->
       if err
         console.log err
       else
         console.log tweet.message
 
-http = require('http')
-io = require('socket.io')
 nodeStatic = require('node-static')
 file = new nodeStatic.Server('./public')
 
-server = http.createServer (request, response) ->
+handler = (request, response) ->
+  console.log 'request came in'
   request.addListener 'end', () ->
     file.serve request, response, (e, err) ->
+      console.log 'server static'
       if (e && (e.status == 404))
         console.log 'file not found'
 
-io.listen(server)
-server.listen 8080, () ->
-  console.log '% listening at %', server.name, server.url
+app = require('http').createServer(handler)
+io = require('socket.io').listen(app)
+
+io.sockets.on 'connection', (socket) ->
+  Tweet.find().limit(10).asc('created_at').run (err,docs) ->
+    if err
+      console.log err
+    else
+      for tweet in docs
+        socket.emit 'tweet', {message: tweet.message, username: tweet.username}
+
+app.listen 8080, () ->
+  console.log '%s listening at %s', app.host, app.port

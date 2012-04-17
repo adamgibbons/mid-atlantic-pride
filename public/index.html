@@ -6,7 +6,7 @@
         <script>
           var append = function (data) {
             console.log(data);
-            $('body').prepend(data);
+            $('#tweets').append('<article>' +  data.message + '</article>');
           }
 
           var socket = io.connect('http://localhost:8080');
@@ -23,5 +23,8 @@
         <img src="images/terps.png" />
       </div>
 
+
+      <section id="tweets">
+      </section>
     </body>
 </html>
