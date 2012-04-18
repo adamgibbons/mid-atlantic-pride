@@ -28,20 +28,21 @@ h2 {
   margin:0;
   padding:0;
   margin-top:20px;
+  margin-bottom:20px;
 }
 
 .logos-wrapper img {
-  margin:0;
+  margin:0 40px;
   padding:0;
-  margin-right:20px;
+  height:120px;
 }
 
-section {
+section, .score {
   width:930px;
   margin:auto;
 }
 
-article {
+article, ul {
   font-family: 'Didact Gothic', sans-serif;
   font-size:19px;
   margin:25px 0;
@@ -55,4 +56,37 @@ article {
 
 article:nth-child(even) {
   background-color:#E4EAEE;
+}
+
+.score {
+  text-align:center;
+  position:relative;
+  top:-20px;
+  left:10px;
+}
+
+.score li {
+  display:inline;
+  margin:0 105px;
+  position:relative;
+  white-space: normal
+}
+
+.score li:first-child {
+  margin-left:0;
+}
+
+.score li:nth-child(2) {
+  margin-left:135px;
+}
+
+.score li:nth-child(3) {
+  position:relative;
+  left:20px;
+}
+
+.score li:last-child {
+  margin-right:0;
+  position:relative;
+  left:-20px;
 }
