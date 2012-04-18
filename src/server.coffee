@@ -18,7 +18,7 @@ io.sockets.on 'connection', (socket) ->
       console.log err
     else
       for tweet in docs
-        socket.emit 'tweet', {message: tweet.message, username: tweet.username}
+        socket.emit 'tweet', {message: tweet.message, username: tweet.username, teams: tweet.teams}
 
 app.listen 8080, () ->
   console.log '%s listening at %s', app.host, app.port
@@ -32,7 +32,7 @@ config =
   access_token_key: '14217347-duzlvWOWTgXwD3lme1niJnjhHPFkh0jLo2O5gucoV'
   access_token_secret: 'oEUbZJBDJ4H8rMbMeOQUIuHmWct82uPv5ftuZmzlPrI'
 
-track = ['Redskins', 'Terps', 'Ravens', 'Hokies']
+teams = ['Redskins', 'Terps', 'Ravens', 'Hokies']
 
 mongodb = mongoose.connect('mongodb://moveline:moveline@ds031857.mongolab.com:31857/moveline')
 
@@ -40,21 +40,26 @@ TweetSchema = new mongoose.Schema({
   message: String
   username: String
   created_at: Date
+  teams: [String]
 })
 
 Tweet = mongoose.model('Tweets', TweetSchema)
 
 twit = new twitter(config)
-twit.immortalStream 'statuses/filter', {"track": track.join(",")}, (stream) ->
+twit.immortalStream 'statuses/filter', {"track": teams.join(",")}, (stream) ->
   stream.on 'data', (data) ->
     tweet = new Tweet()
     tweet.message = data.text
     tweet.username = data.user.name
     tweet.created_at = data.created_at
+    for team in teams
+      if data.text.indexOf(team) isnt -1
+        tweet.teams.push(team)
+
     tweet.save (err) ->
       if err
         console.log err
       else
-        console.log tweet.message
-        io.sockets.emit('tweet', {message: tweet.message, username: tweet.username})
+        console.log tweet.teams.join(', '), tweet.message
+        io.sockets.emit('tweet', {message: tweet.message, username: tweet.username, teams: tweet.teams})
 
