@@ -33,10 +33,17 @@ h2 {
   margin-right:70px;
 }
 
-
-#tweets article {
+article {
   font-family:sans-serif;
   margin:15px 0;
   text-align:left;
+  margin:auto;
 }
+
+article:even {
+  background-color:#ccc;
+
+}
+
+
 
