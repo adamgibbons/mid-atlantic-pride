@@ -53,7 +53,7 @@ twit.immortalStream 'statuses/filter', {"track": teams.join(",")}, (stream) ->
     tweet.username = data.user.name
     tweet.created_at = data.created_at
     for team in teams
-      if data.text.indexOf(team) isnt -1
+      if data.text.toLowerCase().indexOf(team.toLowerCase()) isnt -1
         tweet.teams.push(team)
 
     tweet.save (err) ->
